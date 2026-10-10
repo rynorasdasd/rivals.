@@ -1,5 +1,5 @@
 --[================================================================]--
---  OSMANTUS.CHEAT | RIVALS HUB (Düzeltilmiş Speed & Rivals Anti-Katana)
+--  OSMANTUS.CHEAT | RIVALS HUB (RightShift, Stabil Speed & Anti-Katana)
 --[================================================================]--
 
 local Players = game:GetService("Players")
@@ -75,7 +75,7 @@ local subLogo = Instance.new("TextLabel")
 subLogo.Size = UDim2.new(1, 0, 0, 20)
 subLogo.Position = UDim2.new(0, 0, 0, 25)
 subLogo.BackgroundTransparency = 1
-subLogo.Text = ".cheat v1.1"
+subLogo.Text = ".cheat v1.2"
 subLogo.TextColor3 = Color3.fromRGB(120, 120, 150)
 subLogo.TextSize = 11
 subLogo.Font = Enum.Font.GothamMedium
@@ -197,7 +197,7 @@ createToggle(combatTab, "Aimbot (Hard-Lock Head)", 5, function(state)
 	aimbotEnabled = state
 end)
 
-createToggle(combatTab, "Anti-Katana (Rivals Deflect Bypass)", 50, function(state)
+createToggle(combatTab, "Anti-Katana (Bypass Parries)", 50, function(state)
 	antiKatanaEnabled = state
 end)
 
@@ -205,12 +205,8 @@ createToggle(visualTab, "Player ESP (Wallhack)", 5, function(state)
 	espEnabled = state
 end)
 
-createToggle(visualTab, "Speed Hack (60 WalkSpeed)", 50, function(state)
+createToggle(visualTab, "Speed Hack (Fast Move)", 50, function(state)
 	speedEnabled = state
-	if not state and player.Character then
-		local hum = player.Character:FindFirstChildOfClass("Humanoid")
-		if hum then hum.WalkSpeed = 16 end
-	end
 end)
 
 createToggle(visualTab, "Noclip (Duvardan Geçme)", 95, function(state)
@@ -221,9 +217,9 @@ createToggle(visualTab, "Weapon Neon Glow", 140, function(state)
 	weaponGlowEnabled = state
 end)
 
--- Menü Açma / Kapama (M Tuşu)
+-- Menü Açma / Kapama (RightShift Tuşu)
 UserInputService.InputBegan:Connect(function(input, gp)
-	if input.KeyCode == Enum.KeyCode.M then
+	if input.KeyCode == Enum.KeyCode.RightShift then
 		menuOpen = not menuOpen
 		mainFrame.Visible = menuOpen
 	end
@@ -292,16 +288,16 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
--- 3. Speed Hack (Fizik Destekli Stabil 60 WalkSpeed)
+-- 3. Speed Hack (Rivals Uyumlu Fizik Hızlandırma)
 RunService.RenderStepped:Connect(function()
 	if speedEnabled and player.Character then
 		local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
 		local hrp = player.Character:FindFirstChild("HumanoidRootPart")
-		if humanoid then
-			humanoid.WalkSpeed = 60
-		end
-		if hrp and humanoid.MoveDirection.Magnitude > 0 then
-			hrp.CFrame = hrp.CFrame + (humanoid.MoveDirection * 0.75)
+		if humanoid and hrp then
+			humanoid.WalkSpeed = 16 -- Sunucu korumasına takılmamak için standart hız
+			if humanoid.MoveDirection.Magnitude > 0 then
+				hrp.CFrame = hrp.CFrame + (humanoid.MoveDirection * 1.2)
+			end
 		end
 	end
 end)
@@ -315,17 +311,18 @@ RunService.Stepped:Connect(function()
 	end
 end)
 
--- 5. Anti-Katana (Rivals Deflect / Savuşturma Kalkanı Kırıcı)
+-- 5. Anti-Katana (Rivals Yakın Dövüş Blok ve Parry Efektlerini Devre Dışı Bırakma)
 RunService.RenderStepped:Connect(function()
 	if antiKatanaEnabled then
 		for _, p in pairs(Players:GetPlayers()) do
 			if p ~= player and p.Character then
-				-- Rivals oyunundaki katana deflect / blok / kalkan objelerini ve parçalarını hedef alır
 				for _, obj in pairs(p.Character:GetDescendants()) do
-					if obj:IsA("BasePart") or obj:IsA("Model") then
+					if obj:IsA("Folder") or obj:IsA("Model") or obj:IsA("Part") or obj:IsA("MeshPart") then
 						local name = obj.Name:lower()
-						if name:find("katana") or name:find("deflect") or name:find("shield") or name:find("parry") or name:find("block") then
-							obj:Destroy()
+						if name:find("parry") or name:find("deflect") or name:find("block") or name:find("shield") or name:find("katana") then
+							pcall(function()
+								obj:Destroy()
+							end)
 						end
 					end
 				end
