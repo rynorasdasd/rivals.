@@ -1,5 +1,5 @@
 --[================================================================]--
---  OSMANTUS.CHEAT | RIVALS HUB (RightShift, Stabil Speed & Anti-Katana)
+--  OSMANTUS.CHEAT | RIVALS HUB (Kırmızı Çerçeve ESP + Can Göstergesi)
 --[================================================================]--
 
 local Players = game:GetService("Players")
@@ -75,7 +75,7 @@ local subLogo = Instance.new("TextLabel")
 subLogo.Size = UDim2.new(1, 0, 0, 20)
 subLogo.Position = UDim2.new(0, 0, 0, 25)
 subLogo.BackgroundTransparency = 1
-subLogo.Text = ".cheat v1.2"
+subLogo.Text = ".cheat v1.3"
 subLogo.TextColor3 = Color3.fromRGB(120, 120, 150)
 subLogo.TextSize = 11
 subLogo.Font = Enum.Font.GothamMedium
@@ -201,7 +201,7 @@ createToggle(combatTab, "Anti-Katana (Bypass Parries)", 50, function(state)
 	antiKatanaEnabled = state
 end)
 
-createToggle(visualTab, "Player ESP (Wallhack)", 5, function(state)
+createToggle(visualTab, "Player ESP + Health Bar", 5, function(state)
 	espEnabled = state
 end)
 
@@ -234,7 +234,7 @@ end)
 
 -- ARKAPLAN İŞLEVLERİ
 
--- 1. ESP
+-- 1. ESP (Kırmızı Çerçeve + Can Göstergesi)
 local espCache = {}
 RunService.RenderStepped:Connect(function()
 	if espEnabled then
@@ -242,15 +242,49 @@ RunService.RenderStepped:Connect(function()
 			if p ~= player and p.Character then
 				local char = p.Character
 				local hrp = char:FindFirstChild("HumanoidRootPart")
-				if hrp and not char:FindFirstChild("OsmantusHighlight") then
-					local hl = Instance.new("Highlight")
-					hl.Name = "OsmantusHighlight"
-					hl.Adornee = char
-					hl.FillColor = Color3.fromRGB(110, 60, 255)
-					hl.OutlineColor = Color3.fromRGB(255, 255, 255)
-					hl.FillTransparency = 0.4
-					hl.Parent = char
-					table.insert(espCache, hl)
+				local humanoid = char:FindFirstChildOfClass("Humanoid")
+				
+				if hrp and not char:FindFirstChild("OsmantusRedBox") then
+					local box = Instance.new("BoxHandleAdornment")
+					box.Name = "OsmantusRedBox"
+					box.Size = Vector3.new(3, 5, 2)
+					box.Adornee = hrp
+					box.AlwaysOnTop = true
+					box.ZIndex = 5
+					box.Transparency = 0.4
+					box.Color3 = Color3.fromRGB(255, 40, 40) -- Tamamen Kırmızı Çerçeve
+					box.Parent = char
+					table.insert(espCache, box)
+				end
+				
+				if hrp and not char:FindFirstChild("OsmantusHealthTag") and humanoid then
+					local billboard = Instance.new("BillboardGui")
+					billboard.Name = "OsmantusHealthTag"
+					billboard.Size = UDim2.new(0, 100, 0, 30)
+					billboard.StudsOffset = Vector3.new(0, 3.5, 0)
+					billboard.AlwaysOnTop = true
+					billboard.Adornee = hrp
+					
+					local textLabel = Instance.new("TextLabel")
+					textLabel.Size = UDim2.new(1, 0, 1, 0)
+					textLabel.BackgroundTransparency = 1
+					textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+					textLabel.TextStrokeTransparency = 0
+					textLabel.TextSize = 13
+					textLabel.Font = Enum.Font.GothamBold
+					textLabel.Parent = billboard
+					
+					billboard.Parent = char
+					table.insert(espCache, billboard)
+				end
+				
+				-- Can miktarını güncel tutma
+				local tag = char:FindFirstChild("OsmantusHealthTag")
+				if tag and humanoid then
+					local txt = tag:FindFirstChildOfClass("TextLabel")
+					if txt then
+						txt.Text = "HP: " .. math.floor(humanoid.Health)
+					end
 				end
 			end
 		end
@@ -288,13 +322,13 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
--- 3. Speed Hack (Rivals Uyumlu Fizik Hızlandırma)
+-- 3. Speed Hack
 RunService.RenderStepped:Connect(function()
 	if speedEnabled and player.Character then
 		local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
 		local hrp = player.Character:FindFirstChild("HumanoidRootPart")
 		if humanoid and hrp then
-			humanoid.WalkSpeed = 16 -- Sunucu korumasına takılmamak için standart hız
+			humanoid.WalkSpeed = 16
 			if humanoid.MoveDirection.Magnitude > 0 then
 				hrp.CFrame = hrp.CFrame + (humanoid.MoveDirection * 1.2)
 			end
@@ -311,7 +345,7 @@ RunService.Stepped:Connect(function()
 	end
 end)
 
--- 5. Anti-Katana (Rivals Yakın Dövüş Blok ve Parry Efektlerini Devre Dışı Bırakma)
+-- 5. Anti-Katana
 RunService.RenderStepped:Connect(function()
 	if antiKatanaEnabled then
 		for _, p in pairs(Players:GetPlayers()) do
