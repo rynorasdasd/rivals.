@@ -1,5 +1,5 @@
 --[================================================================]--
---  KORAX HUB - RIVALS SPECIAL EDITION (Birebir Arayüz & Fonksiyonlar)
+--  OSMANTUS.CHEAT | RIVALS HUB (Videodaki Fluent UI Sekmeli Tasarım)
 --[================================================================]--
 
 local Players = game:GetService("Players")
@@ -7,7 +7,6 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local TweenService = game:GetService("TweenService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
@@ -15,7 +14,7 @@ local camera = Workspace.CurrentCamera
 
 repeat task.wait() until player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 
--- Sistem Değişkenleri
+-- Durum Değişkenleri
 local menuOpen = false
 local espEnabled = false
 local aimbotEnabled = false
@@ -24,90 +23,129 @@ local noclipEnabled = false
 local antiKatanaEnabled = false
 local weaponGlowEnabled = false
 
--- Eski Menüyü Temizleme
-if playerGui:FindFirstChild("KoraxHubUI") then
-	playerGui.KoraxHubUI:Destroy()
+-- Eski Menüyü Temizle
+if playerGui:FindFirstChild("OsmantusCheatGui") then
+	playerGui.OsmantusCheatGui:Destroy()
 end
 
--- ScreenGui
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "KoraxHubUI"
+screenGui.Name = "OsmantusCheatGui"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
--- Ana Çerçeve (Korax Hub Dark Theme)
+-- Ana Pencere (Fluent UI / Korax Tarzı Geniş Panel)
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 320, 0, 480)
-mainFrame.Position = UDim2.new(0.5, -160, 0.5, -240)
-mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+mainFrame.Size = UDim2.new(0, 480, 0, 340)
+mainFrame.Position = UDim2.new(0.5, -240, 0.5, -170)
+mainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
 mainFrame.BorderSizePixel = 0
 mainFrame.Visible = false
 mainFrame.Parent = screenGui
 
 local mainCorner = Instance.new("UICorner")
-mainCorner.CornerRadius = UDim.new(0, 10)
+mainCorner.CornerRadius = UDim.new(0, 8)
 mainCorner.Parent = mainFrame
 
 local mainStroke = Instance.new("UIStroke")
-mainStroke.Color = Color3.fromRGB(0, 170, 255)
+mainStroke.Color = Color3.fromRGB(110, 60, 255)
 mainStroke.Thickness = 1.5
 mainStroke.Parent = mainFrame
 
--- Başlık Çubuğu (Header)
-local titleBar = Instance.new("Frame")
-titleBar.Size = UDim2.new(1, 0, 0, 45)
-titleBar.BackgroundColor3 = Color3.fromRGB(22, 22, 30)
-titleBar.BorderSizePixel = 0
-titleBar.Parent = mainFrame
+-- Sol Menü Paneli (Sekme Barı)
+local sidebar = Instance.new("Frame")
+sidebar.Size = UDim2.new(0, 130, 1, 0)
+sidebar.BackgroundColor3 = Color3.fromRGB(14, 14, 19)
+sidebar.BorderSizePixel = 0
+sidebar.Parent = mainFrame
 
-local titleCorner = Instance.new("UICorner")
-titleCorner.CornerRadius = UDim.new(0, 10)
-titleCorner.Parent = titleBar
+local sideCorner = Instance.new("UICorner")
+sideCorner.CornerRadius = UDim.new(0, 8)
+sideCorner.Parent = sidebar
 
-local titleText = Instance.new("TextLabel")
-titleText.Size = UDim2.new(1, -20, 1, 0)
-titleText.Position = UDim2.new(0, 15, 0, 0)
-titleText.BackgroundTransparency = 1
-titleText.Text = "🌀 KORAX HUB  |  Rivals v2.4"
-titleText.TextColor3 = Color3.fromRGB(0, 195, 255)
-titleText.TextSize = 15
-titleText.Font = Enum.Font.GothamBold
-titleText.TextXAlignment = Enum.TextXAlignment.Left
-titleText.Parent = titleBar
+-- Logo / Başlık
+local logoText = Instance.new("TextLabel")
+logoText.Size = UDim2.new(1, 0, 0, 50)
+logoText.BackgroundTransparency = 1
+logoText.Text = "OSMANTUS"
+logoText.TextColor3 = Color3.fromRGB(180, 130, 255)
+logoText.TextSize = 15
+logoText.Font = Enum.Font.GothamBold
+logoText.Parent = sidebar
 
-local subtitleText = Instance.new("TextLabel")
-subtitleText.Size = UDim2.new(1, -20, 1, 0)
-subtitleText.Position = UDim2.new(0, 15, 0, 14)
-subtitleText.BackgroundTransparency = 1
-subtitleText.Text = "Bas/Kapat Tuşu: [ M ]"
-subtitleText.TextColor3 = Color3.fromRGB(120, 130, 150)
-subtitleText.TextSize = 11
-subtitleText.Font = Enum.Font.GothamMedium
-subtitleText.TextXAlignment = Enum.TextXAlignment.Left
-subtitleText.Parent = titleBar
+local subLogo = Instance.new("TextLabel")
+subLogo.Size = UDim2.new(1, 0, 0, 20)
+subLogo.Position = UDim2.new(0, 0, 0, 25)
+subLogo.BackgroundTransparency = 1
+subLogo.Text = ".cheat v1.0"
+subLogo.TextColor3 = Color3.fromRGB(120, 120, 150)
+subLogo.TextSize = 11
+subLogo.Font = Enum.Font.GothamMedium
+subLogo.Parent = sidebar
 
--- Kaydırılabilir İÇerik Alanı (ScrollingFrame - Buton Taşmalarını Önler)
-local container = Instance.new("ScrollingFrame")
-container.Size = UDim2.new(1, -20, 1, -60)
-container.Position = UDim2.new(0, 10, 0, 50)
-container.BackgroundTransparency = 1
-container.BorderSizePixel = 0
-container.CanvasSize = UDim2.new(0, 0, 0, 420)
-container.ScrollBarThickness = 4
-container.ScrollBarImageColor3 = Color3.fromRGB(0, 170, 255)
-container.Parent = mainFrame
+-- Sağ İçerik Alanı
+local contentArea = Instance.new("Frame")
+contentArea.Size = UDim2.new(1, -140, 1, -15)
+contentArea.Position = UDim2.new(0, 135, 0, 10)
+contentArea.BackgroundTransparency = 1
+contentArea.Parent = mainFrame
 
--- Korax Hub Şık Toggle Butonu Oluşturucu
-local function createKoraxToggle(text, posY, callback)
-	local frame = Instance.new("Frame")
-	frame.Size = UDim2.new(1, -10, 0, 45)
-	frame.Position = UDim2.new(0, 0, 0, posY)
-	frame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-	frame.BorderSizePixel = 0
-	frame.Parent = container
+-- Sekme İçeriklerini Tutan Çerçeveler
+local combatTab = Instance.new("ScrollingFrame")
+combatTab.Size = UDim2.new(1, 0, 1, 0)
+combatTab.BackgroundTransparency = 1
+combatTab.BorderSizePixel = 0
+combatTab.CanvasSize = UDim2.new(0, 0, 0, 250)
+combatTab.ScrollBarThickness = 3
+combatTab.Visible = true
+combatTab.Parent = contentArea
+
+local visualTab = Instance.new("ScrollingFrame")
+visualTab.Size = UDim2.new(1, 0, 1, 0)
+visualTab.BackgroundTransparency = 1
+visualTab.BorderSizePixel = 0
+visualTab.CanvasSize = UDim2.new(0, 0, 0, 250)
+visualTab.ScrollBarThickness = 3
+visualTab.Visible = false
+visualTab.Parent = contentArea
+
+-- Sekme Değiştirme Butonları
+local function createTabButton(text, posY, targetTab)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0.9, 0, 0, 35)
+	btn.Position = UDim2.new(0.05, 0, 0, posY)
+	btn.BackgroundColor3 = Color3.fromRGB(22, 22, 30)
+	btn.BorderSizePixel = 0
+	btn.Text = text
+	btn.TextColor3 = Color3.fromRGB(180, 180, 200)
+	btn.TextSize = 12
+	btn.Font = Enum.Font.GothamSemibold
+	btn.Parent = sidebar
 	
 	local corner = Instance.new("UICorner")
-	corner.CornerRadius = UDim.new(0, 8)
+	corner.CornerRadius = UDim.new(0, 6)
+	corner.Parent = btn
+	
+	btn.MouseButton1Click:Connect(function()
+		combatTab.Visible = false
+		visualTab.Visible = false
+		targetTab.Visible = true
+	end)
+end
+
+createTabButton("Combat", 70, combatTab)
+createTabButton("Visuals & Misc", 110, visualTab)
+
+-- Şık Toggle Oluşturucu
+local function createToggle(parentContainer, text, posY, callback)
+	local frame = Instance.new("Frame")
+	frame.Size = UDim2.new(1, -10, 0, 40)
+	frame.Position = UDim2.new(0, 0, 0, posY)
+	frame.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
+	frame.BorderSizePixel = 0
+	frame.Parent = parentContainer
+	
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 6)
 	corner.Parent = frame
 	
 	local label = Instance.new("TextLabel")
@@ -115,15 +153,15 @@ local function createKoraxToggle(text, posY, callback)
 	label.Position = UDim2.new(0, 12, 0, 0)
 	label.BackgroundTransparency = 1
 	label.Text = text
-	label.TextColor3 = Color3.fromRGB(220, 220, 240)
-	label.TextSize = 13
-	label.Font = Enum.Font.GothamSemibold
+	label.TextColor3 = Color3.fromRGB(210, 210, 230)
+	label.TextSize = 12
+	label.Font = Enum.Font.GothamMedium
 	label.TextXAlignment = Enum.TextXAlignment.Left
 	label.Parent = frame
 	
 	local toggleBtn = Instance.new("TextButton")
-	toggleBtn.Size = UDim2.new(0, 44, 0, 22)
-	toggleBtn.Position = UDim2.new(1, -54, 0.5, -11)
+	toggleBtn.Size = UDim2.new(0, 38, 0, 20)
+	toggleBtn.Position = UDim2.new(1, -48, 0.5, -10)
 	toggleBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
 	toggleBtn.BorderSizePixel = 0
 	toggleBtn.Text = ""
@@ -134,8 +172,8 @@ local function createKoraxToggle(text, posY, callback)
 	btnCorner.Parent = toggleBtn
 	
 	local circle = Instance.new("Frame")
-	circle.Size = UDim2.new(0, 16, 0, 16)
-	circle.Position = UDim2.new(0, 3, 0.5, -8)
+	circle.Size = UDim2.new(0, 14, 0, 14)
+	circle.Position = UDim2.new(0, 3, 0.5, -7)
 	circle.BackgroundColor3 = Color3.fromRGB(180, 180, 200)
 	circle.BorderSizePixel = 0
 	circle.Parent = toggleBtn
@@ -148,26 +186,31 @@ local function createKoraxToggle(text, posY, callback)
 	toggleBtn.MouseButton1Click:Connect(function()
 		isOn = not isOn
 		if isOn then
-			TweenService:Create(toggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 170, 255)}):Play()
-			TweenService:Create(circle, TweenInfo.new(0.2), {Position = UDim2.new(1, -19, 0.5, -8), BackgroundColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+			TweenService:Create(toggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(110, 60, 255)}):Play()
+			TweenService:Create(circle, TweenInfo.new(0.2), {Position = UDim2.new(1, -17, 0.5, -7), BackgroundColor3 = Color3.fromRGB(255, 255, 255)}):Play()
 		else
 			TweenService:Create(toggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(45, 45, 60)}):Play()
-			TweenService:Create(circle, TweenInfo.new(0.2), {Position = UDim2.new(0, 3, 0.5, -8), BackgroundColor3 = Color3.fromRGB(180, 180, 200)}):Play()
+			TweenService:Create(circle, TweenInfo.new(0.2), {Position = UDim2.new(0, 3, 0.5, -7), BackgroundColor3 = Color3.fromRGB(180, 180, 200)}):Play()
 		end
 		callback(isOn)
 	end)
 end
 
--- Videodaki Kategoriler ve Butonlar
-createKoraxToggle("Aimbot (Hard-Lock Head)", 10, function(state)
+-- COMBAT SEKMESI ELEMANLARI
+createToggle(combatTab, "Aimbot (Hard-Lock Head)", 5, function(state)
 	aimbotEnabled = state
 end)
 
-createKoraxToggle("Player ESP (Wallhack)", 65, function(state)
+createToggle(combatTab, "Anti-Katana / Shield Bypass", 50, function(state)
+	antiKatanaEnabled = state
+end)
+
+-- VISUALS SEKMESI ELEMANLARI
+createToggle(visualTab, "Player ESP (Wallhack)", 5, function(state)
 	espEnabled = state
 end)
 
-createKoraxToggle("Speed Hack (60 WalkSpeed)", 120, function(state)
+createToggle(visualTab, "Speed Hack (60 WalkSpeed)", 50, function(state)
 	speedEnabled = state
 	if not state and player.Character then
 		local hum = player.Character:FindFirstChildOfClass("Humanoid")
@@ -175,15 +218,11 @@ createKoraxToggle("Speed Hack (60 WalkSpeed)", 120, function(state)
 	end
 end)
 
-createKoraxToggle("Noclip (Duvardan Geçme)", 175, function(state)
+createToggle(visualTab, "Noclip (Duvardan Geçme)", 95, function(state)
 	noclipEnabled = state
 end)
 
-createKoraxToggle("Anti-Katana / Shield Bypass", 230, function(state)
-	antiKatanaEnabled = state
-end)
-
-createKoraxToggle("Weapon Neon Glow (Chams)", 285, function(state)
+createToggle(visualTab, "Weapon Neon Glow", 140, function(state)
 	weaponGlowEnabled = state
 end)
 
@@ -202,7 +241,9 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
--- 1. ESP Logic
+-- ARKAPLAN İŞLEVLERİ (LOGIC)
+
+-- 1. ESP
 local espCache = {}
 RunService.RenderStepped:Connect(function()
 	if espEnabled then
@@ -210,14 +251,13 @@ RunService.RenderStepped:Connect(function()
 			if p ~= player and p.Character then
 				local char = p.Character
 				local hrp = char:FindFirstChild("HumanoidRootPart")
-				
-				if hrp and not char:FindFirstChild("KoraxHighlight") then
+				if hrp and not char:FindFirstChild("OsmantusHighlight") then
 					local hl = Instance.new("Highlight")
-					hl.Name = "KoraxHighlight"
+					hl.Name = "OsmantusHighlight"
 					hl.Adornee = char
-					hl.FillColor = Color3.fromRGB(0, 170, 255)
+					hl.FillColor = Color3.fromRGB(110, 60, 255)
 					hl.OutlineColor = Color3.fromRGB(255, 255, 255)
-					hl.FillTransparency = 0.3
+					hl.FillTransparency = 0.4
 					hl.Parent = char
 					table.insert(espCache, hl)
 				end
@@ -231,12 +271,11 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
--- 2. Aimbot Logic (Sağ Tık)
+-- 2. Aimbot (Sağ Tık)
 RunService.RenderStepped:Connect(function()
 	if aimbotEnabled and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
 		local closestHead = nil
 		local shortestDist = math.huge
-		
 		for _, p in pairs(Players:GetPlayers()) do
 			if p ~= player and p.Character and p.Character:FindFirstChild("Head") then
 				local humanoid = p.Character:FindFirstChildOfClass("Humanoid")
@@ -245,7 +284,6 @@ RunService.RenderStepped:Connect(function()
 					local screenPoint, onScreen = camera:WorldToViewportPoint(head.Position)
 					local mousePos = UserInputService:GetMouseLocation()
 					local dist = (Vector2.new(screenPoint.X, screenPoint.Y) - mousePos).Magnitude
-					
 					if dist < shortestDist then
 						shortestDist = dist
 						closestHead = head
@@ -253,35 +291,30 @@ RunService.RenderStepped:Connect(function()
 				end
 			end
 		end
-		
 		if closestHead then
 			camera.CFrame = CFrame.lookAt(camera.CFrame.Position, closestHead.Position)
 		end
 	end
 end)
 
--- 3. Speed Logic
+-- 3. Speed
 RunService.RenderStepped:Connect(function()
 	if speedEnabled and player.Character then
 		local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
-		if humanoid then
-			humanoid.WalkSpeed = 60
-		end
+		if humanoid then humanoid.WalkSpeed = 60 end
 	end
 end)
 
--- 4. Noclip Logic
+-- 4. Noclip
 RunService.Stepped:Connect(function()
 	if noclipEnabled and player.Character then
 		for _, part in pairs(player.Character:GetDescendants()) do
-			if part:IsA("BasePart") then
-				part.CanCollide = false
-			end
+			if part:IsA("BasePart") then part.CanCollide = false end
 		end
 	end
 end)
 
--- 5. Anti-Katana Logic
+-- 5. Anti-Katana
 RunService.RenderStepped:Connect(function()
 	if antiKatanaEnabled then
 		for _, p in pairs(Players:GetPlayers()) do
@@ -297,7 +330,7 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
--- 6. Weapon Glow Logic
+-- 6. Weapon Glow
 RunService.RenderStepped:Connect(function()
 	if weaponGlowEnabled then
 		for _, obj in pairs(camera:GetDescendants()) do
@@ -305,7 +338,7 @@ RunService.RenderStepped:Connect(function()
 				local name = obj.Name:lower()
 				if name ~= "head" and name ~= "humanoidrootpart" then
 					obj.Material = Enum.Material.Neon
-					obj.Color = Color3.fromRGB(0, 255, 255)
+					obj.Color = Color3.fromRGB(180, 130, 255)
 				end
 			end
 		end
