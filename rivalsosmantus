@@ -1,5 +1,5 @@
 --[================================================================]--
---  OSMANTUS.CHEAT | RIVALS HUB (Hassas İnce 2D ESP & Sol Can Barı)
+--  OSMANTUS.CHEAT | RIVALS HUB (Mikro İnce Sol Can Barı & 2D ESP)
 --[================================================================]--
 
 local Players = game:GetService("Players")
@@ -75,7 +75,7 @@ local subLogo = Instance.new("TextLabel")
 subLogo.Size = UDim2.new(1, 0, 0, 20)
 subLogo.Position = UDim2.new(0, 0, 0, 25)
 subLogo.BackgroundTransparency = 1
-subLogo.Text = ".cheat v1.6"
+subLogo.Text = ".cheat v1.7"
 subLogo.TextColor3 = Color3.fromRGB(120, 120, 150)
 subLogo.TextSize = 11
 subLogo.Font = Enum.Font.GothamMedium
@@ -201,7 +201,7 @@ createToggle(combatTab, "Anti-Katana (Bypass Parries)", 50, function(state)
 	antiKatanaEnabled = state
 end)
 
-createToggle(visualTab, "Player ESP (2D Box + Micro Bar)", 5, function(state)
+createToggle(visualTab, "Player ESP (Red Box + Micro Bar)", 5, function(state)
 	espEnabled = state
 end)
 
@@ -234,7 +234,7 @@ end)
 
 -- ARKAPLAN İŞLEVLERİ
 
--- 1. ESP (Tam Olarak Fotoğraftaki Gibi Mikro Dikey Can Barı + İnce Çerçeve)[cite: 5]
+-- 1. ESP (Mikro İnce Sol Can Barı + Şeffaf İnce Çerçeve)
 local espCache = {}
 RunService.RenderStepped:Connect(function()
 	if espEnabled then
@@ -244,46 +244,46 @@ RunService.RenderStepped:Connect(function()
 				local hrp = char:FindFirstChild("HumanoidRootPart")
 				local humanoid = char:FindFirstChildOfClass("Humanoid")
 				
-				-- Mor renk yapan highlight'ları sil
+				-- Mor Highlight'ları sil
 				local oldHl = char:FindFirstChildOfClass("Highlight")
 				if oldHl then oldHl:Destroy() end
 				
-				-- Şeffaf Kırmızı Dış Çerçeve[cite: 5]
+				-- İnce Kırmızı Çerçeve
 				if hrp and not char:FindFirstChild("OsmantusRedBox") then
 					local box = Instance.new("BoxHandleAdornment")
 					box.Name = "OsmantusRedBox"
-					box.Size = Vector3.new(2.5, 4.5, 1.5)
+					box.Size = Vector3.new(2.4, 4.2, 1.2)
 					box.Adornee = hrp
 					box.AlwaysOnTop = true
 					box.ZIndex = 5
-					box.Transparency = 0.88
+					box.Transparency = 0.9 -- Sadece dış çizgileri tutar
 					box.Color3 = Color3.fromRGB(255, 30, 30)
 					box.Parent = char
 					table.insert(espCache, box)
 				end
 				
-				-- Fotoğraftaki Gibi Karakter Boyutunda İncecik Sol Can Barı[cite: 5]
+				-- MİKRO BOYUTLANDIRILMIŞ İNCE SOL CAN BARI
 				if hrp and not char:FindFirstChild("OsmantusVerticalBar") and humanoid then
 					local billboard = Instance.new("BillboardGui")
 					billboard.Name = "OsmantusVerticalBar"
-					billboard.Size = UDim2.new(0, 2, 0, 4.5) -- Tam karakter hizasında küçültülmüş boyut[cite: 5]
-					billboard.StudsOffset = Vector3.new(-1.6, 0, 0) -- Çerçevenin tam sol kenarına sıfır hizalama[cite: 5]
+					billboard.Size = UDim2.new(0, 3, 0, 50) -- Sabit piksel boyutuyla minicik boy
+					billboard.StudsOffset = Vector3.new(-1.8, 0, 0) -- Çerçevenin hemen solu
 					billboard.AlwaysOnTop = true
 					billboard.Adornee = hrp
 					
-					-- Arka plan çizgisi (Arka Siyah Çizgi)
+					-- Arka Plan Çizgisi (Çok İnce Siyah)
 					local bgLine = Instance.new("Frame")
 					bgLine.Name = "BGLine"
 					bgLine.Size = UDim2.new(1, 0, 1, 0)
-					bgLine.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+					bgLine.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 					bgLine.BorderSizePixel = 0
 					bgLine.Parent = billboard
 					
-					-- Can dolgusu (Yeşil Bar)[cite: 5]
+					-- Can Dolgusu (Çok İnce Yeşil)
 					local fillLine = Instance.new("Frame")
 					fillLine.Name = "FillLine"
 					fillLine.Size = UDim2.new(1, 0, 1, 0)
-					fillLine.BackgroundColor3 = Color3.fromRGB(50, 255, 50)
+					fillLine.BackgroundColor3 = Color3.fromRGB(0, 255, 80)
 					fillLine.BorderSizePixel = 0
 					fillLine.Parent = bgLine
 					
@@ -291,7 +291,7 @@ RunService.RenderStepped:Connect(function()
 					table.insert(espCache, billboard)
 				end
 				
-				-- Can oranına göre dikey dolguyu anlık güncelle[cite: 5]
+				-- Can oranına göre dolguyu anlık ayarla
 				local barGui = char:FindFirstChild("OsmantusVerticalBar")
 				if barGui and humanoid then
 					local fill = barGui:FindFirstChild("BGLine"):FindFirstChild("FillLine")
