@@ -1,5 +1,5 @@
 --[================================================================]--
---  OSMANTUS.CHEAT | RIVALS HUB (Videodaki Fluent UI Sekmeli Tasarım)
+--  OSMANTUS.CHEAT | RIVALS HUB (Düzeltilmiş Speed & Rivals Anti-Katana)
 --[================================================================]--
 
 local Players = game:GetService("Players")
@@ -33,7 +33,7 @@ screenGui.Name = "OsmantusCheatGui"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
--- Ana Pencere (Fluent UI / Korax Tarzı Geniş Panel)
+-- Ana Pencere
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 480, 0, 340)
 mainFrame.Position = UDim2.new(0.5, -240, 0.5, -170)
@@ -62,7 +62,6 @@ local sideCorner = Instance.new("UICorner")
 sideCorner.CornerRadius = UDim.new(0, 8)
 sideCorner.Parent = sidebar
 
--- Logo / Başlık
 local logoText = Instance.new("TextLabel")
 logoText.Size = UDim2.new(1, 0, 0, 50)
 logoText.BackgroundTransparency = 1
@@ -76,7 +75,7 @@ local subLogo = Instance.new("TextLabel")
 subLogo.Size = UDim2.new(1, 0, 0, 20)
 subLogo.Position = UDim2.new(0, 0, 0, 25)
 subLogo.BackgroundTransparency = 1
-subLogo.Text = ".cheat v1.0"
+subLogo.Text = ".cheat v1.1"
 subLogo.TextColor3 = Color3.fromRGB(120, 120, 150)
 subLogo.TextSize = 11
 subLogo.Font = Enum.Font.GothamMedium
@@ -89,7 +88,6 @@ contentArea.Position = UDim2.new(0, 135, 0, 10)
 contentArea.BackgroundTransparency = 1
 contentArea.Parent = mainFrame
 
--- Sekme İçeriklerini Tutan Çerçeveler
 local combatTab = Instance.new("ScrollingFrame")
 combatTab.Size = UDim2.new(1, 0, 1, 0)
 combatTab.BackgroundTransparency = 1
@@ -108,7 +106,6 @@ visualTab.ScrollBarThickness = 3
 visualTab.Visible = false
 visualTab.Parent = contentArea
 
--- Sekme Değiştirme Butonları
 local function createTabButton(text, posY, targetTab)
 	local btn = Instance.new("TextButton")
 	btn.Size = UDim2.new(0.9, 0, 0, 35)
@@ -135,7 +132,6 @@ end
 createTabButton("Combat", 70, combatTab)
 createTabButton("Visuals & Misc", 110, visualTab)
 
--- Şık Toggle Oluşturucu
 local function createToggle(parentContainer, text, posY, callback)
 	local frame = Instance.new("Frame")
 	frame.Size = UDim2.new(1, -10, 0, 40)
@@ -196,16 +192,15 @@ local function createToggle(parentContainer, text, posY, callback)
 	end)
 end
 
--- COMBAT SEKMESI ELEMANLARI
+-- Butonlar
 createToggle(combatTab, "Aimbot (Hard-Lock Head)", 5, function(state)
 	aimbotEnabled = state
 end)
 
-createToggle(combatTab, "Anti-Katana / Shield Bypass", 50, function(state)
+createToggle(combatTab, "Anti-Katana (Rivals Deflect Bypass)", 50, function(state)
 	antiKatanaEnabled = state
 end)
 
--- VISUALS SEKMESI ELEMANLARI
 createToggle(visualTab, "Player ESP (Wallhack)", 5, function(state)
 	espEnabled = state
 end)
@@ -241,7 +236,7 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
--- ARKAPLAN İŞLEVLERİ (LOGIC)
+-- ARKAPLAN İŞLEVLERİ
 
 -- 1. ESP
 local espCache = {}
@@ -297,11 +292,17 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
--- 3. Speed
+-- 3. Speed Hack (Fizik Destekli Stabil 60 WalkSpeed)
 RunService.RenderStepped:Connect(function()
 	if speedEnabled and player.Character then
 		local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
-		if humanoid then humanoid.WalkSpeed = 60 end
+		local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+		if humanoid then
+			humanoid.WalkSpeed = 60
+		end
+		if hrp and humanoid.MoveDirection.Magnitude > 0 then
+			hrp.CFrame = hrp.CFrame + (humanoid.MoveDirection * 0.75)
+		end
 	end
 end)
 
@@ -314,17 +315,20 @@ RunService.Stepped:Connect(function()
 	end
 end)
 
--- 5. Anti-Katana
+-- 5. Anti-Katana (Rivals Deflect / Savuşturma Kalkanı Kırıcı)
 RunService.RenderStepped:Connect(function()
 	if antiKatanaEnabled then
 		for _, p in pairs(Players:GetPlayers()) do
 			if p ~= player and p.Character then
-				local s1 = p.Character:FindFirstChild("KatanaBlock")
-				local s2 = p.Character:FindFirstChild("KatanaShield")
-				local s3 = p.Character:FindFirstChild("Deflect")
-				if s1 then s1:Destroy() end
-				if s2 then s2:Destroy() end
-				if s3 then s3:Destroy() end
+				-- Rivals oyunundaki katana deflect / blok / kalkan objelerini ve parçalarını hedef alır
+				for _, obj in pairs(p.Character:GetDescendants()) do
+					if obj:IsA("BasePart") or obj:IsA("Model") then
+						local name = obj.Name:lower()
+						if name:find("katana") or name:find("deflect") or name:find("shield") or name:find("parry") or name:find("block") then
+							obj:Destroy()
+						end
+					end
+				end
 			end
 		end
 	end
