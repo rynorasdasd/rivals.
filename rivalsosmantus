@@ -1,5 +1,5 @@
 --[================================================================]--
---  OSMANTUS.CHEAT | RIVALS HUB (Kırmızı Çerçeve ESP + Can Göstergesi)
+--  OSMANTUS.CHEAT | RIVALS HUB (Kırmızı Çerçeve + Yan Can Barı Sürümü)
 --[================================================================]--
 
 local Players = game:GetService("Players")
@@ -75,7 +75,7 @@ local subLogo = Instance.new("TextLabel")
 subLogo.Size = UDim2.new(1, 0, 0, 20)
 subLogo.Position = UDim2.new(0, 0, 0, 25)
 subLogo.BackgroundTransparency = 1
-subLogo.Text = ".cheat v1.3"
+subLogo.Text = ".cheat v1.4"
 subLogo.TextColor3 = Color3.fromRGB(120, 120, 150)
 subLogo.TextSize = 11
 subLogo.Font = Enum.Font.GothamMedium
@@ -201,7 +201,7 @@ createToggle(combatTab, "Anti-Katana (Bypass Parries)", 50, function(state)
 	antiKatanaEnabled = state
 end)
 
-createToggle(visualTab, "Player ESP + Health Bar", 5, function(state)
+createToggle(visualTab, "Player ESP (Red Box + Health)", 5, function(state)
 	espEnabled = state
 end)
 
@@ -234,7 +234,7 @@ end)
 
 -- ARKAPLAN İŞLEVLERİ
 
--- 1. ESP (Kırmızı Çerçeve + Can Göstergesi)
+-- 1. ESP (Saf Kırmızı Çerçeve + Yan Can Barı)
 local espCache = {}
 RunService.RenderStepped:Connect(function()
 	if espEnabled then
@@ -244,6 +244,11 @@ RunService.RenderStepped:Connect(function()
 				local hrp = char:FindFirstChild("HumanoidRootPart")
 				local humanoid = char:FindFirstChildOfClass("Humanoid")
 				
+				-- Eski kalan olası mor highlight varsa temizle
+				local oldHl = char:FindFirstChildOfClass("Highlight")
+				if oldHl then oldHl:Destroy() end
+				
+				-- Kırmızı Çerçeve (BoxHandleAdornment)
 				if hrp and not char:FindFirstChild("OsmantusRedBox") then
 					local box = Instance.new("BoxHandleAdornment")
 					box.Name = "OsmantusRedBox"
@@ -251,38 +256,71 @@ RunService.RenderStepped:Connect(function()
 					box.Adornee = hrp
 					box.AlwaysOnTop = true
 					box.ZIndex = 5
-					box.Transparency = 0.4
-					box.Color3 = Color3.fromRGB(255, 40, 40) -- Tamamen Kırmızı Çerçeve
+					box.Transparency = 0.5
+					box.Color3 = Color3.fromRGB(255, 0, 0) -- Keskin Kırmızı
 					box.Parent = char
 					table.insert(espCache, box)
 				end
 				
-				if hrp and not char:FindFirstChild("OsmantusHealthTag") and humanoid then
+				-- Sağda/Üstte Can Göstergesi ve Barı
+				if hrp and not char:FindFirstChild("OsmantusHealthBarGUI") and humanoid then
 					local billboard = Instance.new("BillboardGui")
-					billboard.Name = "OsmantusHealthTag"
-					billboard.Size = UDim2.new(0, 100, 0, 30)
+					billboard.Name = "OsmantusHealthBarGUI"
+					billboard.Size = UDim2.new(0, 120, 0, 40)
 					billboard.StudsOffset = Vector3.new(0, 3.5, 0)
 					billboard.AlwaysOnTop = true
 					billboard.Adornee = hrp
 					
+					-- Arka plan çerçevesi
+					local bgBar = Instance.new("Frame")
+					bgBar.Name = "BGBar"
+					bgBar.Size = UDim2.new(1, 0, 0, 6)
+					bgBar.Position = UDim2.new(0, 0, 0, 20)
+					bgBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+					bgBar.BorderSizePixel = 0
+					bgBar.Parent = billboard
+					
+					local bgCorner = Instance.new("UICorner")
+					bgCorner.CornerRadius = UDim.new(1, 0)
+					bgCorner.Parent = bgBar
+					
+					-- Can dolgu çubuğu
+					local healthFill = Instance.new("Frame")
+					healthFill.Name = "HealthFill"
+					healthFill.Size = UDim2.new(1, 0, 1, 0)
+					healthFill.BackgroundColor3 = Color3.fromRGB(0, 255, 100)
+					healthFill.BorderSizePixel = 0
+					healthFill.Parent = bgBar
+					
+					local fillCorner = Instance.new("UICorner")
+					fillCorner.CornerRadius = UDim.new(1, 0)
+					fillCorner.Parent = healthFill
+					
+					-- Can metni (Örn: 100 / 100)
 					local textLabel = Instance.new("TextLabel")
-					textLabel.Size = UDim2.new(1, 0, 1, 0)
+					textLabel.Name = "HealthText"
+					textLabel.Size = UDim2.new(1, 0, 0, 18)
+					textLabel.Position = UDim2.new(0, 0, 0, 0)
 					textLabel.BackgroundTransparency = 1
 					textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 					textLabel.TextStrokeTransparency = 0
-					textLabel.TextSize = 13
+					textLabel.TextSize = 12
 					textLabel.Font = Enum.Font.GothamBold
+					textLabel.Text = "HP: 100"
 					textLabel.Parent = billboard
 					
 					billboard.Parent = char
 					table.insert(espCache, billboard)
 				end
 				
-				-- Can miktarını güncel tutma
-				local tag = char:FindFirstChild("OsmantusHealthTag")
-				if tag and humanoid then
-					local txt = tag:FindFirstChildOfClass("TextLabel")
-					if txt then
+				-- Can miktarını ve bar oranını anlık güncelle
+				local guiTag = char:FindFirstChild("OsmantusHealthBarGUI")
+				if guiTag and humanoid then
+					local fill = guiTag:FindFirstChild("BGBar"):FindFirstChild("HealthFill")
+					local txt = guiTag:FindFirstChild("HealthText")
+					if fill and txt then
+						local healthPercent = math.clamp(humanoid.Health / humanoid.MaxHealth, 0, 1)
+						fill.Size = UDim2.new(healthPercent, 0, 1, 0)
 						txt.Text = "HP: " .. math.floor(humanoid.Health)
 					end
 				end
