@@ -1,5 +1,5 @@
 --[================================================================]--
---  OSMANTUS.CHEAT | RIVALS HUB (Kırmızı Çerçeve + Yan Can Barı Sürümü)
+--  OSMANTUS.CHEAT | RIVALS HUB (Kırmızı Çerçeve + Sol Dikey Can Barı)
 --[================================================================]--
 
 local Players = game:GetService("Players")
@@ -75,7 +75,7 @@ local subLogo = Instance.new("TextLabel")
 subLogo.Size = UDim2.new(1, 0, 0, 20)
 subLogo.Position = UDim2.new(0, 0, 0, 25)
 subLogo.BackgroundTransparency = 1
-subLogo.Text = ".cheat v1.4"
+subLogo.Text = ".cheat v1.5"
 subLogo.TextColor3 = Color3.fromRGB(120, 120, 150)
 subLogo.TextSize = 11
 subLogo.Font = Enum.Font.GothamMedium
@@ -201,7 +201,7 @@ createToggle(combatTab, "Anti-Katana (Bypass Parries)", 50, function(state)
 	antiKatanaEnabled = state
 end)
 
-createToggle(visualTab, "Player ESP (Red Box + Health)", 5, function(state)
+createToggle(visualTab, "Player ESP (Red Box + Left Bar)", 5, function(state)
 	espEnabled = state
 end)
 
@@ -234,7 +234,7 @@ end)
 
 -- ARKAPLAN İŞLEVLERİ
 
--- 1. ESP (Saf Kırmızı Çerçeve + Yan Can Barı)
+-- 1. ESP (Kırmızı Dış Çerçeve + Sol Dikey Can Barı)[cite: 3]
 local espCache = {}
 RunService.RenderStepped:Connect(function()
 	if espEnabled then
@@ -244,11 +244,11 @@ RunService.RenderStepped:Connect(function()
 				local hrp = char:FindFirstChild("HumanoidRootPart")
 				local humanoid = char:FindFirstChildOfClass("Humanoid")
 				
-				-- Eski kalan olası mor highlight varsa temizle
+				-- Mor renk oluşturan olası highlight'ları temizle
 				local oldHl = char:FindFirstChildOfClass("Highlight")
 				if oldHl then oldHl:Destroy() end
 				
-				-- Kırmızı Çerçeve (BoxHandleAdornment)
+				-- Sadece dış çizgileri kırmızı olan kutu (BoxHandleAdornment)[cite: 3]
 				if hrp and not char:FindFirstChild("OsmantusRedBox") then
 					local box = Instance.new("BoxHandleAdornment")
 					box.Name = "OsmantusRedBox"
@@ -256,72 +256,51 @@ RunService.RenderStepped:Connect(function()
 					box.Adornee = hrp
 					box.AlwaysOnTop = true
 					box.ZIndex = 5
-					box.Transparency = 0.5
-					box.Color3 = Color3.fromRGB(255, 0, 0) -- Keskin Kırmızı
+					box.Transparency = 0.85 -- İçini şeffaf yapıp sadece dış çerçevenin görünmesini sağlar
+					box.Color3 = Color3.fromRGB(255, 0, 0) -- Net Kırmızı
 					box.Parent = char
 					table.insert(espCache, box)
 				end
 				
-				-- Sağda/Üstte Can Göstergesi ve Barı
-				if hrp and not char:FindFirstChild("OsmantusHealthBarGUI") and humanoid then
+				-- Sol tarafta dikey ince can barı[cite: 3]
+				if hrp and not char:FindFirstChild("OsmantusVerticalBar") and humanoid then
 					local billboard = Instance.new("BillboardGui")
-					billboard.Name = "OsmantusHealthBarGUI"
-					billboard.Size = UDim2.new(0, 120, 0, 40)
-					billboard.StudsOffset = Vector3.new(0, 3.5, 0)
+					billboard.Name = "OsmantusVerticalBar"
+					billboard.Size = UDim2.new(0, 40, 0, 5)
+					billboard.StudsOffset = Vector3.new(-2.1, 0, 0) -- Karakterin sol tarafına hizalama[cite: 3]
 					billboard.AlwaysOnTop = true
 					billboard.Adornee = hrp
 					
-					-- Arka plan çerçevesi
-					local bgBar = Instance.new("Frame")
-					bgBar.Name = "BGBar"
-					bgBar.Size = UDim2.new(1, 0, 0, 6)
-					bgBar.Position = UDim2.new(0, 0, 0, 20)
-					bgBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-					bgBar.BorderSizePixel = 0
-					bgBar.Parent = billboard
+					-- Dikey arkaplan çizgisi (Siyah/Gri)
+					local bgLine = Instance.new("Frame")
+					bgLine.Name = "BGLine"
+					bgLine.Size = UDim2.new(0, 3, 0, 100)
+					bgLine.Position = UDim2.new(0, 0, 0, -50)
+					bgLine.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+					bgLine.BorderSizePixel = 0
+					bgLine.Parent = billboard
 					
-					local bgCorner = Instance.new("UICorner")
-					bgCorner.CornerRadius = UDim.new(1, 0)
-					bgCorner.Parent = bgBar
-					
-					-- Can dolgu çubuğu
-					local healthFill = Instance.new("Frame")
-					healthFill.Name = "HealthFill"
-					healthFill.Size = UDim2.new(1, 0, 1, 0)
-					healthFill.BackgroundColor3 = Color3.fromRGB(0, 255, 100)
-					healthFill.BorderSizePixel = 0
-					healthFill.Parent = bgBar
-					
-					local fillCorner = Instance.new("UICorner")
-					fillCorner.CornerRadius = UDim.new(1, 0)
-					fillCorner.Parent = healthFill
-					
-					-- Can metni (Örn: 100 / 100)
-					local textLabel = Instance.new("TextLabel")
-					textLabel.Name = "HealthText"
-					textLabel.Size = UDim2.new(1, 0, 0, 18)
-					textLabel.Position = UDim2.new(0, 0, 0, 0)
-					textLabel.BackgroundTransparency = 1
-					textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-					textLabel.TextStrokeTransparency = 0
-					textLabel.TextSize = 12
-					textLabel.Font = Enum.Font.GothamBold
-					textLabel.Text = "HP: 100"
-					textLabel.Parent = billboard
+					-- Can azaldıkça yukarı doğru azalan dikey dolgu (Yeşil)
+					local fillLine = Instance.new("Frame")
+					fillLine.Name = "FillLine"
+					fillLine.Size = UDim2.new(1, 0, 1, 0)
+					fillLine.Position = UDim2.new(0, 0, 0, 0)
+					fillLine.BackgroundColor3 = Color3.fromRGB(0, 255, 80)
+					fillLine.BorderSizePixel = 0
+					fillLine.Parent = bgLine
 					
 					billboard.Parent = char
 					table.insert(espCache, billboard)
 				end
 				
-				-- Can miktarını ve bar oranını anlık güncelle
-				local guiTag = char:FindFirstChild("OsmantusHealthBarGUI")
-				if guiTag and humanoid then
-					local fill = guiTag:FindFirstChild("BGBar"):FindFirstChild("HealthFill")
-					local txt = guiTag:FindFirstChild("HealthText")
-					if fill and txt then
+				-- Can oranına göre dikey barın boyunu güncelle[cite: 3]
+				local barGui = char:FindFirstChild("OsmantusVerticalBar")
+				if barGui and humanoid then
+					local fill = barGui:FindFirstChild("BGLine"):FindFirstChild("FillLine")
+					if fill then
 						local healthPercent = math.clamp(humanoid.Health / humanoid.MaxHealth, 0, 1)
-						fill.Size = UDim2.new(healthPercent, 0, 1, 0)
-						txt.Text = "HP: " .. math.floor(humanoid.Health)
+						fill.Size = UDim2.new(1, 0, healthPercent, 0)
+						fill.Position = UDim2.new(0, 0, 1 - healthPercent, 0)
 					end
 				end
 			end
